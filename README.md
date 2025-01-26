@@ -11,8 +11,11 @@ pip install tqdm
 
 
 If you're reading this, you might know what these tools are used for already but in case you don't;
+
 These tools are used to partition and encrypt files, as well as later decrypt them.
+
 I wrote this code when I was a little drunk, but here is an example of how this would be used in a real case.
+
 > 100GB file named crazyman.rar in c:\when
 
 > user partitions crazyman.rar into parts of 500mb each into c:\now
@@ -31,9 +34,13 @@ I wrote this code when I was a little drunk, but here is an example of how this 
 
 *upcoming updates;*
   Support for .zip, .7z, etc. partition encrypting and decrypting
+  
   Allow encrypter to partition folders (This will remove the need to turn a folder into a .rar before partitioning it, the program will do it for you.)
+  
   Better Error Logging
+  
   Sleek and Easy GUI
+
   
 Virustotal links:
 
