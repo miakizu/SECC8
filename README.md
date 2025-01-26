@@ -33,5 +33,8 @@ I wrote this code when I was a little drunk, but here is an example of how this 
   
 Virustotal links:
 
+
 Decrypter: https://www.virustotal.com/gui/file/743c43db4e878466fe080092e1480e593f0f72b74be707fe4d1cd4faa064cec5
+
+
 Encrypter: https://www.virustotal.com/gui/file/b254baa4d0c8a431774944a1f1b8d363a6b0961a35597864b0d73b5b94175491
