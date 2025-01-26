@@ -1,9 +1,13 @@
 # SECC8
 **MOST IMPORTANT**
 You must;
+
 pip install colorama
+
 pip install rar
+
 pip install tqdm
+
 
 
 If you're reading this, you might know what these tools are used for already but in case you don't;
