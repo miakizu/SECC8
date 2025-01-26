@@ -10,10 +10,15 @@ If you're reading this, you might know what these tools are used for already but
 These tools are used to partition and encrypt files, as well as later decrypt them.
 I wrote this code when I was a little drunk, but here is an example of how this would be used in a real case.
 > 100GB file named crazyman.rar in c:\when
+
 > user partitions crazyman.rar into parts of 500mb each into c:\now
+
 > user uploads each 500mb file **AND THE PASSWORDS.txt FILE** onto multiup for easy downloads
+
 > user provides info on how to decrypt the file and extract it for use
+
 > customer downloads every 500mb file, **AND PASSWORDS.txt**
+
 > customer runs extractor tool, oh wow, i have the extract contents of crazyman.rar
 
 **I AM NOT LIABLE IF THIS TOOL IS USED MALICIOUSLY AT ALL. THIS WAS USED TO ENCRYPT AND COMPRESS CODE.**
