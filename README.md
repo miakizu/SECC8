@@ -33,6 +33,7 @@ I wrote this code when I was a little drunk, but here is an example of how this 
 ***This is currently on version 1.0. It is buggy as hell, missing a GUI, and currently only will work if you partition a .rar file.***
 
 *upcoming updates;*
+
   Support for .zip, .7z, etc. partition encrypting and decrypting
   
   Allow encrypter to partition folders (This will remove the need to turn a folder into a .rar before partitioning it, the program will do it for you.)
@@ -42,6 +43,8 @@ I wrote this code when I was a little drunk, but here is an example of how this 
   Sleek and Easy GUI
 
   
+
+
 Virustotal links:
 
 
