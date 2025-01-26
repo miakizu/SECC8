@@ -13,7 +13,7 @@
   ```
 
 - **Disclaimer:**  
-  This tool is intended for legal and ethical use only. The author is **not liable** for any misuse or malicious activities conducted with this software. Use it responsibly.
+  This tool is intended for legal and ethical use only. As the author, I am **not liable** for any misuse or malicious activities conducted with this software. Use it responsibly.
 
 ---
 
@@ -50,7 +50,7 @@ The current version of SECC8 is functional but has some limitations:
 ---
 
 ## **VirusTotal Scans**
-For your peace of mind, here are the VirusTotal links for the tool's components:
+For your peace of mind, here are the VirusTotal links for the tool's components (V1.0):
 - **Decrypter:** [VirusTotal Scan](https://www.virustotal.com/gui/file/743c43db4e878466fe080092e1480e593f0f72b74be707fe4d1cd4faa064cec5)
 - **Encrypter:** [VirusTotal Scan](https://www.virustotal.com/gui/file/b254baa4d0c8a431774944a1f1b8d363a6b0961a35597864b0d73b5b94175491)
 
