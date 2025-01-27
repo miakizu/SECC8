@@ -19,7 +19,7 @@
 
 ## **How It Works**
 SECC8 allows you to:
-1. Partition large `.rar`, '.zip', and '.7z' files into smaller chunks (e.g., 500MB each).
+1. Partition large `.rar`, `.zip`, and `.7z` files into smaller chunks (e.g., 500MB each).
 2. Encrypt the partitioned files.
 3. Decrypt and reassemble the files into their original form.
 
