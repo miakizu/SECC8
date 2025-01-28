@@ -42,7 +42,6 @@ The current version of SECC8 is functional but has some limitations:
 ---
 
 ## **Planned Updates**
-- Support for additional file formats
 - Ability to partition and encrypt folders directly (eliminating the need to manually compress folders into archive files first).
 - Improved error logging for easier debugging.
 - A sleek and user-friendly GUI.
