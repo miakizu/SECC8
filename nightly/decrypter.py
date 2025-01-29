@@ -30,7 +30,7 @@ ASCII_ART = f"""
  | |__   _| | ___| |__  __  _| |_ _ _ __   __ _ 
  |  __| | | |/ _ \\  __| \\ \\/ / __| | '_ \\ / _` |
  | |    | | |  __/ |____ >  <| |_| | | | | (_| |
- |_|    | |_|\\___|______/_/\\_\\\\__|_|_| |_|\\__, |
+ |_|    |_|_|\\___|______/_/\\_\\\\__|_|_| |_|\\__, |
                                             __/ |
                                            |___/ 
 {Fore.BLUE}
@@ -112,17 +112,39 @@ def extract_archive(archive_path, output_dir):
         raise ex
 
 def handle_folder_rename(original_path):
+    import time
+    max_retries = 3
+    delay = 1
+    
     try:
         items = os.listdir(original_path)
-        # If only one directory exists in the extraction folder, use it as the final path
-        if len(items) == 1:
-            item_path = os.path.join(original_path, items[0])
-            if os.path.isdir(item_path):
-                print_info(f"Extracted contents found in: {item_path}")
-                return item_path
+        if not items:
+            return original_path
+
+        target_name = items[0] if len(items) == 1 else "contents"
+        new_path = os.path.join(os.path.dirname(original_path), target_name)
+
+        for attempt in range(max_retries):
+            try:
+                os.rename(original_path, new_path)
+                print_info(f"Renamed {original_path} to {new_path}")
+                return new_path
+            except PermissionError:
+                if attempt < max_retries - 1:
+                    print_warning(f"Permission denied, retrying in {delay}sec (attempt {attempt+1}/{max_retries})")
+                    time.sleep(delay)
+                    continue
+                raise
+
+    except PermissionError as pe:
+        print_warning(f"Failed to rename folder due to permission issues: {pe}")
+        print_info("Possible reasons:")
+        print_info("- Folder open in another program")
+        print_info("- Antivirus scanning the folder")
+        print_info("- Insufficient permissions")
         return original_path
     except Exception as ex:
-        log_error("Error handling extracted directory structure", ex)
+        log_error("Folder rename error", ex)
         return original_path
 
 def handle_decryption(folder, extract_to):
@@ -185,21 +207,15 @@ def handle_decryption(folder, extract_to):
         print_header("Reconstructing Original File...")
         reconstructed_path = os.path.join(extract_to, original_filename)
         try:
-            # Collect all temp_part_* files and sort by part number
-            temp_files = sorted(
-                [f for f in os.listdir(extract_dir) if f.startswith("temp_part_")],
-                key=lambda x: int(x.split('_')[2])
-            )
-            
-            if not temp_files:
-                raise FileNotFoundError("No temporary part files found for reconstruction")
-            
             with open(reconstructed_path, 'wb') as out_file:
-                for temp_file in temp_files:
-                    part_path = os.path.join(extract_dir, temp_file)
-                    with open(part_path, 'rb') as in_file:
+                for part_num in range(1, num_parts + 1):
+                    part_file = os.path.join(
+                        extract_dir,
+                        f"{os.path.splitext(zip_files[0])[0].rsplit('_part', 1)[0]}_part{part_num}_data"
+                    )
+                    with open(part_file, 'rb') as in_file:
                         shutil.copyfileobj(in_file, out_file)
-                    os.remove(part_path)
+                    os.remove(part_file)
             print_info(f"Reconstructed file saved as {reconstructed_path}")
         except Exception as ex:
             log_error("File reconstruction failed", ex)
