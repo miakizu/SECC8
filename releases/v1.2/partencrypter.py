@@ -12,7 +12,7 @@ import time
 init(autoreset=True)
 
 # Updated base64 encoded strings
-s1 = base64.b64decode("UGF0aCBub3QgZm91bmQh".encode()).decode()  # "Path not found!"
+s1 = base64.b64decode("UGF0aCBub3QgZm91bmQh".encode()).decode()  
 s2 = base64.b64decode("UGFydGl0aW9uaW5nIGZpbGU=".encode()).decode()
 s3 = base64.b64decode("RW50ZXIgdGhlIHBhdGggdG8gdGhlIGZpbGUvZm9sZGVyIHlvdSB3YW50IHRvIHByb2Nlc3M6IA==".encode()).decode()
 s4 = base64.b64decode("T3V0cHV0IGRpcmVjdG9yeTog".encode()).decode()
