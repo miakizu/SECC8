@@ -37,7 +37,6 @@ SECC8 allows you to:
 The current version of SECC8 is functional but has some limitations:
 - **Buggy:** Expect some issues during use.
 - **No GUI:** The tool is command-line only.
-- **Limited File Support:** Only `.rar` files are supported for partitioning and encryption.
 
 ---
 
