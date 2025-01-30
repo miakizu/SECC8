@@ -9,7 +9,9 @@ import time
 import threading
 import tkinter as tk
 import random
+import math
 from tkinter import ttk, filedialog, messagebox, scrolledtext
+
 
 class FilePartitionerApp:
     def __init__(self, root):
@@ -42,10 +44,12 @@ class FilePartitionerApp:
         # Animated ASCII Art
         self.ascii_base = self.get_ascii_art().split('\n')
         self.animation_step = 0
+        self.glow_phase = 0
+        self.particles = []
         self.logo_label = tk.Label(self.main_container, 
                                  text='\n'.join(self.ascii_base), 
-                                 font=("Courier", 8), 
-                                 fg="red",
+                                 font=("Courier", 9), 
+                                 fg="#FF0000",
                                  bg='black',
                                  justify=tk.LEFT)
         self.logo_label.pack(pady=10, fill=tk.X)
@@ -103,38 +107,59 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
         self.animate_ascii()
 
     def animate_ascii(self):
+        # Calculate glowing color
+        self.glow_phase = (self.glow_phase + 0.15) % (2 * math.pi)
+        glow_intensity = int((math.sin(self.glow_phase) + 1) * 127)
+        main_color = f"#{min(255, 0x88 + glow_intensity):02X}0000"
+        highlight_color = f"#FF{min(255, 0x66 + glow_intensity):02X}00"
+
         modified_lines = []
-        eye_chars = ['()', '||', '\\\\', '//']
-        particle_chars = ['*', '.', '\'', '~']
-        die_variants = ['DIE', 'D|E', 'D!E', 'DÏE']
-        human_variants = ['HUMAN', 'HUM4N', 'HÜMAN', 'HUMÂN']
+        eye_states = ['oo', 'OO', 'ÔÔ', 'ØØ', '00']
+        particle_chars = ['✧', '✦', '✵', '❋', '❂', '✺']
+        die_variants = ['DIE', 'DÏE', 'D!E', 'DÌE', 'DÎE']
+        human_variants = ['HUMAN', 'HÜMAN', 'HUM4N', 'HÛMAN', 'HŪMAN']
 
-        for line in self.ascii_base:
-            # Animate eyes
-            if '()' in line:
-                line = line.replace('()', eye_chars[self.animation_step % len(eye_chars)])
+        # Add new particles
+        if random.random() < 0.4:
+            self.particles.append({
+                'x': random.randint(0, 70),
+                'y': 0,
+                'char': random.choice(particle_chars),
+                'life': random.randint(10, 20)
+            })
+
+        # Process each line
+        for y, line in enumerate(self.ascii_base):
+            line_chars = list(line)
             
-            # Animate text elements
-            if 'DIE' in line:
-                line = line.replace('DIE', die_variants[self.animation_step % len(die_variants)])
-            if 'HUMAN' in line:
-                line = line.replace('HUMAN', human_variants[self.animation_step % len(human_variants)])
+            # Update particles
+            for part in self.particles[:]:
+                if part['y'] == y and 0 <= part['x'] < len(line_chars):
+                    line_chars[part['x']] = part['char']
+                    part['y'] += 1
+                    part['life'] -= 1
+                    if part['life'] <= 0:
+                        self.particles.remove(part)
             
-            # Add particle effects
-            if random.random() < 0.2:
-                char_list = list(line)
-                for _ in range(2):
-                    if len(char_list) > 10:
-                        pos = random.randint(10, len(char_list)-1)
-                        if char_list[pos] == ' ':
-                            char_list[pos] = random.choice(particle_chars)
-                line = ''.join(char_list)
+            # Animate special elements
+            line_str = ''.join(line_chars)
+            if 'DIE' in line_str:
+                line_str = line_str.replace('DIE', die_variants[self.animation_step % len(die_variants)])
+            if 'HUMAN' in line_str:
+                line_str = line_str.replace('HUMAN', human_variants[self.animation_step % len(human_variants)])
+            if '()' in line_str:
+                line_str = line_str.replace('()', eye_states[self.animation_step % len(eye_states)])
+            
+            modified_lines.append(line_str)
 
-            modified_lines.append(line)
-
-        self.logo_label.config(text='\n'.join(modified_lines))
+        # Update label with glowing colors
+        self.logo_label.config(
+            text='\n'.join(modified_lines),
+            fg=highlight_color if self.animation_step % 2 else main_color
+        )
+        
         self.animation_step += 1
-        self.root.after(300, self.animate_ascii)
+        self.root.after(100, self.animate_ascii)
 
     def create_input_controls(self):
         self.create_input_row("Input File/Folder:", self.browse_file, self.browse_folder)
