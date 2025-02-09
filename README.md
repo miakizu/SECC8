@@ -10,8 +10,9 @@
   pip install colorama
   pip install rarfile
   pip install tqdm
+  pip install tk
   ```
-
+(NOTE: You only need to pip install tk on V2.0)
 - **Disclaimer:**  
   This tool is intended for legal and ethical use only. As the author, I am **not liable** for any misuse or malicious activities conducted with this software. Use it responsibly.
 
@@ -41,14 +42,13 @@ The current version of SECC8 is functional but has some limitations:
 ---
 
 ## **Planned Updates**
-- Ability to partition and encrypt folders directly (eliminating the need to manually compress folders into archive files first).
 - Improved error logging for easier debugging.
 - A sleek and user-friendly GUI.
 
 ---
 
 ## **VirusTotal Scans**
-For your peace of mind, here are the VirusTotal links for the tool's components (V1.0):
+Here are the VirusTotal links for the tool's (V1.0):
 - **Decrypter:** [VirusTotal Scan](https://www.virustotal.com/gui/file/743c43db4e878466fe080092e1480e593f0f72b74be707fe4d1cd4faa064cec5)
 - **Encrypter:** [VirusTotal Scan](https://www.virustotal.com/gui/file/b254baa4d0c8a431774944a1f1b8d363a6b0961a35597864b0d73b5b94175491)
 
