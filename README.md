@@ -12,7 +12,7 @@
   pip install tqdm
   pip install tk
   ```
-(NOTE: You only need to pip install tk on V2.0)
+
 - **Disclaimer:**  
   This tool is intended for legal and ethical use only. As the author, I am **not liable** for any misuse or malicious activities conducted with this software. Use it responsibly.
 
@@ -34,16 +34,9 @@ SECC8 allows you to:
 
 ---
 
-## **Current Version: 1.0**
+## **Current Version: 2.0**
 The current version of SECC8 is functional but has some limitations:
 - **Buggy:** Expect some issues during use.
-- **No GUI:** The tool is command-line only.
-
----
-
-## **Planned Updates**
-- Improved error logging for easier debugging.
-- A sleek and user-friendly GUI.
 
 ---
 
