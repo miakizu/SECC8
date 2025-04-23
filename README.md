@@ -12,7 +12,7 @@
   pip install tqdm
   pip install tk
   ```
-(NOTE: You only need to pip install tk on V2.0)
+
 - **Disclaimer:**  
   This tool is intended for legal and ethical use only. As the author, I am **not liable** for any misuse or malicious activities conducted with this software. Use it responsibly.
 
@@ -34,17 +34,21 @@ SECC8 allows you to:
 
 ---
 
-## **Current Version: 1.0**
+## **Current Version: 2.0**
 The current version of SECC8 is functional but has some limitations:
 - **Buggy:** Expect some issues during use.
-- **No GUI:** The tool is command-line only.
 
----
-
-## **Planned Updates**
-- Improved error logging for easier debugging.
-- A sleek and user-friendly GUI.
-
+## **Upcoming Updates**
+SECC8 has a few more possible updates before being marked as completed. As of this descriptions update, our current priority is:
+- *Checksum Verification and Capability:* Verify file integrities before attempting to recreate file. Also, if you are using an old version of the encrpyter that does not utilize the checksum method yet, newer versions of the decrpyter will retain compatability and be able to skip checksum verification.
+- *Fully Encrypted Passwords File:* The plan to add encrypted JSON files to store passwords instead of the current simple base64 encryption.
+- *Password Functionalities:* Ability to put a "Master Pass" that is needed in order to access the passwords file, enhancing security and ensuring nobody can access it without the key.
+- *Localization:* Branches of the project will be made with localizations for other languages. After V3 is released, we will create a German, Russian, and Portugese localization. We would love for the community to create localizations for other langugaes to bring the community more together and ensure accuracy.
+- *Promotion:* Less of a code update, but we plan to advertise the tool more in order to gain popularity and a user base.
+- *Fully Open Source:* In an early stage of development, some parts of code were encrypted with base64 that really didn't need to be, as they were easily decryptable and they were not necessary to enhance security. With the release of V3 we plan to make practically all the code accessible to ensure people can read at their own leisure for peace of mind.
+- *Collaboration:* We are currently reaching out to other coders to speed up development and get more ideas. If you would like to contribute, you can add me on discord with the button below:
+  
+[![Add Me on Discord](https://img.shields.io/badge/Discord-Add%20Me-blue?style=for-the-badge&logo=discord)](https://discord.com/users/1324459975464063067)
 ---
 
 ## **VirusTotal Scans**
