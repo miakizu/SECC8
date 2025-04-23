@@ -47,6 +47,7 @@ SECC8 has a few more possible updates before being marked as completed. As of th
 - *Promotion:* Less of a code update, but we plan to advertise the tool more in order to gain popularity and a user base.
 - *Fully Open Source:* In an early stage of development, some parts of code were encrypted with base64 that really didn't need to be, as they were easily decryptable and they were not necessary to enhance security. With the release of V3 we plan to make practically all the code accessible to ensure people can read at their own leisure for peace of mind.
 - *Collaboration:* We are currently reaching out to other coders to speed up development and get more ideas. If you would like to contribute, you can add me on discord with the button below:
+  
 [![Add Me on Discord](https://img.shields.io/badge/Discord-Add%20Me-blue?style=for-the-badge&logo=discord)](https://discord.com/users/1324459975464063067)
 ---
 
