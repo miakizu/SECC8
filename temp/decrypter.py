@@ -9,6 +9,9 @@ import threading
 from tkinter import *
 from tkinter import ttk, filedialog, scrolledtext
 from colorama import Fore, Style, init
+import hashlib
+
+# DEVELOPMENT VERSION
 
 # Initialize colorama
 init(autoreset=True)
@@ -37,6 +40,17 @@ class DecryptionGUI:
         self.root.configure(bg='black')
         self.setup_ui()
         self.create_log_handler()
+        
+    def calculate_checksum(self, file_path):
+        sha256 = hashlib.sha256()
+        with open(file_path, 'rb') as f:
+            while True:
+                chunk = f.read(8192)
+                if not chunk:
+                    break
+                sha256.update(chunk)
+        return sha256.hexdigest()
+
 
     def ASCII_ART(self):
         return r"""
@@ -230,60 +244,76 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
     def handle_decryption(self, folder, extract_to):
         try:
             self.log_header("Starting Decryption Process")
-            
-            # Password file handling
-            p = os.path.join(folder, "passwords.txt")
-            if not os.path.isfile(p):
+
+            pw_path = os.path.join(folder, "passwords.txt")
+            if not os.path.isfile(pw_path):
                 self.log_warning(s4)
                 self.log_error("Password file not found")
                 return
 
             try:
-                with open(p, 'r') as pw_file:
+                with open(pw_path, 'r') as pw_file:
                     content = base64.b64decode(pw_file.read()).decode().split('\n')
                     original_filename = content[0]
-                    passwords_list = content[1:]
+                    password_lines = content[1:]
                     self.log_info(f"Original filename: {original_filename}")
             except Exception as ex:
                 self.log_error("Failed to read password file", ex)
                 return
 
-            # Part detection
-            self.log_header("Determining Number of Parts...")
-            try:
-                zip_files = sorted(
-                    [f for f in os.listdir(folder) if re.match(r".+_part\d+\.zip", f)],
-                    key=lambda x: int(re.search(r"_part(\d+)\.zip", x).group(1))
-                )
-                num_parts = len(zip_files)
-                self.log_info(f"Found {num_parts} parts")
-            except Exception as ex:
-                self.log_error("Failed to identify parts", ex)
-                return
+            # Parse password + checksum
+            passwords_and_checksums = []
+            for line in password_lines:
+                if '|' in line:
+                    part_info, checksum = line.split('|')
+                    password = part_info.split(': ')[1]
+                    passwords_and_checksums.append((password, checksum))
+                else:
+                    password = line.split(': ')[1]
+                    passwords_and_checksums.append((password, None))
 
-            if num_parts != len(passwords_list):
+            zip_files = sorted(
+                [f for f in os.listdir(folder) if re.match(r".+_part\d+\.zip", f)],
+                key=lambda x: int(re.search(r"_part(\d+)\.zip", x).group(1))
+            )
+
+            if len(zip_files) != len(passwords_and_checksums):
                 self.log_warning(s4)
-                self.log_error(f"Mismatch: {num_parts} parts vs {len(passwords_list)} passwords")
+                self.log_error(f"Mismatch: {len(zip_files)} parts vs {len(passwords_and_checksums)} passwords")
                 return
 
-            # Parts extraction
             self.log_header("Extracting Parts...")
-            error_flag = False
             extract_dir = os.path.join(extract_to, "temp_parts")
             os.makedirs(extract_dir, exist_ok=True)
+            error_flag = False
 
-            for idx in range(num_parts):
-                zip_path = os.path.join(folder, zip_files[idx])
-                password = passwords_list[idx].split(': ')[1]
-                self.log_info(f"Extracting {zip_files[idx]} with password: {password}")
+            for idx, zip_file in enumerate(zip_files):
+                zip_path = os.path.join(folder, zip_file)
+                password, expected_checksum = passwords_and_checksums[idx]
+                self.log_info(f"Extracting {zip_file} with password: {password}")
+
                 try:
                     pyminizip.uncompress(zip_path, password, extract_dir, 0)
-                    self.log_info(f"Extracted {zip_files[idx]} successfully.")
+
+                    extracted_file = [f for f in os.listdir(extract_dir) if f.startswith(f"temp_part_{idx+1}")]
+                    if not extracted_file:
+                        raise FileNotFoundError("No extracted part found.")
+                    temp_part_path = os.path.join(extract_dir, extracted_file[0])
+
+                    actual_checksum = self.calculate_checksum(temp_part_path)
+
+                    if expected_checksum is None:
+                        self.log_warning(f"No checksum for part {idx+1}. Skipping verification.")
+                    elif actual_checksum != expected_checksum:
+                        self.log_error(f"Checksum mismatch for part {idx+1}. Expected {expected_checksum}, got {actual_checksum}")
+                        error_flag = True
+                    else:
+                        self.log_info(f"Checksum verified for part {idx+1}")
+
                 except Exception as ex:
-                    self.log_error(f"Failed to extract {zip_files[idx]}", ex)
+                    self.log_error(f"Failed to extract {zip_file}", ex)
                     error_flag = True
 
-            # File reconstruction
             self.log_header("Reconstructing Original File...")
             reconstructed_path = os.path.join(extract_to, original_filename)
             try:
@@ -291,10 +321,9 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
                     [f for f in os.listdir(extract_dir) if f.startswith("temp_part_")],
                     key=lambda x: int(x.split('_')[2])
                 )
-                
                 if not temp_files:
-                    raise FileNotFoundError("No temporary part files found for reconstruction")
-                
+                    raise FileNotFoundError("No temporary part files found.")
+
                 with open(reconstructed_path, 'wb') as out_file:
                     for temp_file in temp_files:
                         part_path = os.path.join(extract_dir, temp_file)
@@ -306,33 +335,25 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
                 self.log_error("File reconstruction failed", ex)
                 error_flag = True
 
-            # Final extraction
+            self.log_header("Extracting Final Archive...")
+            extract_dir_final = os.path.join(extract_to, "extracted_contents")
+            os.makedirs(extract_dir_final, exist_ok=True)
             try:
-                self.log_header("Extracting Final Archive...")
-                extract_dir_final = os.path.join(extract_to, "extracted_contents")
-                os.makedirs(extract_dir_final, exist_ok=True)
-                
                 self.extract_archive(reconstructed_path, extract_dir_final)
                 final_dir = self.handle_folder_rename(extract_dir_final)
-                
-                if os.path.exists(reconstructed_path):
-                    try:
-                        os.remove(reconstructed_path)
-                        self.log_info(f"Cleaned up temporary file: {reconstructed_path}")
-                    except Exception as clean_ex:
-                        self.log_warning(f"Couldn't delete temporary file: {clean_ex}")
-                        self.log_info("You can safely delete this file manually later")
+
+                try:
+                    os.remove(reconstructed_path)
+                    self.log_info(f"Cleaned up temporary file: {reconstructed_path}")
+                except Exception as clean_ex:
+                    self.log_warning(f"Couldn't delete temporary file: {clean_ex}")
 
                 if not error_flag:
                     self.log_success("\nEXTRACTION SUCCESSFUL!\n")
                     self.log_info(f"Final output location: {final_dir}")
-
             except RuntimeError as ex:
                 self.log_warning("Dependency required!\n" + str(ex))
                 self.log_info(f"Reconstructed file preserved at:\n{reconstructed_path}")
-                self.log_info("You can either:")
-                self.log_info("1. Install the missing dependency and try again")
-                self.log_info("2. Extract it manually with appropriate software")
             except Exception as ex:
                 self.log_error("Final extraction failed", ex)
 
@@ -340,6 +361,7 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
 
         except Exception as ex:
             self.log_error("Unexpected error", ex)
+
 
 if __name__ == "__main__":
     root = Tk()

@@ -5,17 +5,18 @@ import pyminizip
 import base64
 import shutil
 import patoolib
-import timepy
+import time
 import threading
 import tkinter as tk
 import random
 import math
-import pyobfuscate
+import hashlib
 from tkinter import ttk, filedialog, messagebox, scrolledtext
+
+# DEVELOPMENT VERSION
 
 class FilePartitionerApp:
     def __init__(self, root):
-        # Initialize tkinter root window
         self.root = root
         self.root.title("Secure File Partitioner")
         self.root.geometry("800x700")
@@ -235,6 +236,13 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
         chars = string.ascii_letters + string.digits + string.punctuation
         return ''.join(secrets.choice(chars) for _ in range(length))
 
+    def _generate_checksum(self, file_path):
+        sha256 = hashlib.sha256()
+        with open(file_path, 'rb') as f:
+            while chunk := f.read(8192):
+                sha256.update(chunk)
+        return sha256.hexdigest()
+
     def archive_folder(self, folder_path, output_dir):
         try:
             self.log_message("Archiving folder...", "blue")
@@ -251,6 +259,7 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
         try:
             part_num = 1
             passwords = []
+            checksums = []
             original_filename = os.path.basename(file_path)
             total_size = os.path.getsize(file_path)
             
@@ -267,6 +276,9 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
                     with open(temp_file, 'wb') as temp:
                         temp.write(chunk)
                     
+                    checksum = self._generate_checksum(temp_file)
+                    checksums.append(checksum)
+                    
                     zip_file = os.path.join(output_dir, f"{os.path.splitext(original_filename)[0]}_part{part_num}.zip")
                     pyminizip.compress(temp_file, None, zip_file, password, 5)
                     os.remove(temp_file)
@@ -275,7 +287,10 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
                     part_num += 1
                     self.root.update_idletasks()
 
-            passwords_with_metadata = [original_filename] + [f"Part {i}: {p}" for i, p in enumerate(passwords, 1)]
+            passwords_with_metadata = [original_filename]
+            for i, (p, cs) in enumerate(zip(passwords, checksums), 1):
+                passwords_with_metadata.append(f"Part {i}: {p}|{cs}")
+            
             passwords_encoded = base64.b64encode("\n".join(passwords_with_metadata).encode()).decode()
             with open(os.path.join(output_dir, "passwords.txt"), 'w') as pw_file:
                 pw_file.write(passwords_encoded)
@@ -332,8 +347,6 @@ dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb
                 self.log_message("Temporary archive cleaned up", "blue")
             except Exception as e:
                 self.log_message(f"Warning: Could not clean up temporary archive: {str(e)}", "orange")
-
-# hash location ->
 
 if __name__ == "__main__":
     root = tk.Tk()
